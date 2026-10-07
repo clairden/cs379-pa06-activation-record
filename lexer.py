@@ -1,8 +1,5 @@
 """
-PA 5 dependency: paste in YOUR OWN completed PA 2 lexer.py here.
-(Needed transitively -- symtable.py imports from parser.py, which
-imports from this file. PA 5's own new work doesn't touch lexing or
-parsing directly.)
+PA 4 dependency: paste in YOUR OWN completed PA 2 lexer.py here.
 
 This is the same file from PA 2's repo -- copy your own working
 tokenize() implementation over this stub before starting parser.py.
@@ -31,6 +28,23 @@ class LexError(Exception):
 
 
 # TODO: build your master regex here, e.g.:
+KEYWORDS = {"let"}
+
+MASTER_PATTERN = re.compile(
+    r"(?P<NUMBER>[0-9]+)"
+    r"|(?P<IDENT>[a-zA-Z_][a-zA-Z0-9_]*)"
+    r"|(?P<PLUS>\+)"
+    r"|(?P<MINUS>-)"
+    r"|(?P<STAR>\*)"
+    r"|(?P<SLASH>/)"
+    r"|(?P<LPAREN>\()"
+    r"|(?P<RPAREN>\))"
+    r"|(?P<ASSIGN>=)"
+    r"|(?P<SEMI>;)"
+    r"|(?P<COMMENT>#[^\n]*)"
+    r"|(?P<WHITESPACE>[ \t\n]+)"
+    r"|(?P<MISMATCH>.)"
+    )
 # _MASTER_RE = re.compile(r"(?P<NUMBER>\d+)|(?P<IDENT>[A-Za-z_]\w*)|...")
 
 
@@ -44,4 +58,25 @@ def tokenize(source: str) -> List[Token]:
     offending character and line) on unrecognized input.
     """
     # TODO
-    raise NotImplementedError
+    tokens = []
+    line = 1
+    pos = 0
+
+    while pos < len(source):
+        m = MASTER_PATTERN.match(source, pos)
+        kind, lexeme = m.lastgroup, m.group()
+        if kind == "WHITESPACE":
+            line += lexeme.count("\n")
+        elif kind == "COMMENT":
+            pass
+        elif kind == "MISMATCH":
+            raise LexError(f"Unexpected char {lexeme!r} at line: {line}")
+        elif kind == "IDENT" and lexeme in KEYWORDS:
+            tokens.append(Token("LET", lexeme, line))
+        else:
+            tokens.append(Token(kind, lexeme, line))
+        pos = m.end()
+
+    tokens.append(Token("EOF", "", line))
+    return tokens
+

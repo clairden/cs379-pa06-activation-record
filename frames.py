@@ -29,27 +29,32 @@ class ActivationRecord:
         dynamic_link: Optional["ActivationRecord"],
     ) -> None:
         # TODO: store all six arguments as attributes of the same names.
-        raise NotImplementedError
+        self.function_name = function_name
+        self.parameters = parameters
+        self.locals_env = locals_env
+        self.return_address = return_address
+        self.static_link = static_link
+        self.dynamic_link = dynamic_link
 
 
 class CallStack:
     def __init__(self) -> None:
         # TODO: internal storage for the stack of frames.
-        raise NotImplementedError
+        self.frames = []
 
     def push(self, record: ActivationRecord) -> None:
         # TODO
-        raise NotImplementedError
+        self.frames.append(record)
 
     def pop(self) -> ActivationRecord:
         """Remove and return the top frame."""
         # TODO
-        raise NotImplementedError
+        self.frames.pop()
 
     def current(self) -> ActivationRecord:
         """Return (without removing) the top frame."""
         # TODO
-        raise NotImplementedError
+        return self.frames[-1]
 
     def trace(self) -> List[str]:
         """
@@ -58,4 +63,14 @@ class CallStack:
         each line must include the function_name and its parameters.
         """
         # TODO
-        raise NotImplementedError
+        result = []
+        for record in self.frames:
+            result.append(
+                f"{record.function_name}: {record.parameters}\n"
+                f"Local environment: {record.locals_env}\n"
+                f"Return address: {record.return_address}\n"
+                f"Static Link: {record.static_link}\n"
+                f"Dynamic Link: {record.dynamic_link}"
+                )
+
+        return result
